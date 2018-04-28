@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  connection: local
+  remote_user: root
+  become: yes
+  gather_facts: no
+  vars_files:
+    - awscreds
+  tasks:
+    - name: create alarm
+      ec2_metric_alarm:
+        state: present
+        aws_access_key: "{{aws_id}}"
+        aws_secret_key: "{{aws_key}}"
+        region: "{{aws_region}}"
+        name: "cpu-high"
+        metric: "CPUUtilization"
+        namespace: "AWS/EC2"
+        statistic: Average
+        comparison: "<="
+        threshold: "0.01"
+        period: 60
+        evaluation_periods: 1
+        unit: "Percent"
+        description: "This will alarm when a bamboo slave's cpu usage average is more than 0.01% for 1 minute "
+        dimensions: {'InstanceId':'i-0088534fe2e22770f'}
+        alarm_actions: arn:aws:sns:us-east-1:509464674133:cpu_high
+        ok_actions: arn:aws:sns:us-east-2:509464674133:cpu_high

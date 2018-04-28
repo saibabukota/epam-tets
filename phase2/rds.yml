@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+  connection: local
+  remote_user: root
+  become: yes
+  gather_facts: no
+  vars_files:
+    - awscreds
+  tasks:
+    - name: provision
+      rds:
+         aws_access_key: "{{aws_id}}"
+         aws_secret_key: "{{aws_key}}"
+         region: "{{aws_region}}"
+         command: create
+         instance_name: vprodb
+         db_engine: MySQL
+         size: 10
+         instance_type: db.t2.micro
+         username: mysql_admin
+         password: gopinadh
+         tags:
+           Environment: testing
+           Application: cms
+           command: facts
+           instance_name: vprodb
+           register: vprodb
+    - debug: var=vprodb
+#    - name: add new instance to the host group
+#      add_host: hostname={{ item.endpoint }}  groupname=launched_db
+#      with_items: '{{vprodb.instance}}'     
+
+
